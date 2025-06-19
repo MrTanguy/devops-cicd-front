@@ -1,25 +1,17 @@
 version: '3.8'
 
 services:
-  astro:
+  frontend:
     build:
       context: .
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     container_name: react-app
-    ports:
-      - "4321:4321" 
-    volumes:
-      - .:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.astro.rule=Host(`cicd-front.louisdev.fr`)"
-      - "traefik.http.routers.astro.entrypoints=websecure"
-      - "traefik.http.services.astro.loadbalancer.server.port=3001"
-      - "traefik.http.routers.astro.service=dash"
-      - "traefik.http.routers.astro.tls.certresolver=leresolver"
+      - "traefik.http.routers.react.rule=Host(`cicd-front.louisdev.fr`)"
+      - "traefik.http.routers.react.entrypoints=websecure"
+      - "traefik.http.routers.react.tls.certresolver=leresolver"
+      - "traefik.http.services.react.loadbalancer.server.port=80"
     networks:
       - traefik
 
