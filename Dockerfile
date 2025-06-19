@@ -1,14 +1,28 @@
-FROM node:20-alpine
+# Étape 1 : Build React App
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-RUN apk update && apk add --no-cache openssl
-
-COPY package.json ./
+COPY package*.json ./
 RUN npm install
 
 COPY . .
 
-EXPOSE 4321
+RUN npm run build
 
-CMD ["npm", "run", "dev", "--host", "0.0.0.0"]
+
+# Étape 2 : Serve via NGINX
+FROM nginx:alpine
+
+# Nettoyer les fichiers par défaut de nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copier le build dans le dossier nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# (optionnel) pour une SPA (React Router)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
