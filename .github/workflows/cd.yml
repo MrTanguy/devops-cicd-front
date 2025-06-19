@@ -1,0 +1,23 @@
+name: CD
+
+on:
+  push:
+    branches: 
+      - prod
+  pull_request:
+    branches:
+      - prod
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USERNAME }}
+          port: 22
+          password: "${{ secrets.PROD_PASSWORD }}"
+          script: "cd ~/cicd/ && ./deploy.sh"
+
